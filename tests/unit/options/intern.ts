@@ -71,7 +71,7 @@ registerSuite('options/intern', {
 				}
 			});
 
-			assert.isTrue(config.options.browser.loader === './node_modules/grunt-dojo2/lib/intern/internLoader.js');
+			assert.isTrue(config.options.browser.loader === './node_modules/grunt-dojo2/lib/intern/loader.js');
 		}
 	}
 });

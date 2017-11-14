@@ -22,7 +22,7 @@ export = function (grunt: IGrunt) {
 				]
 			},
 			browser: (loader || browserLoader) ? {} : {
-				loader: './node_modules/grunt-dojo2/lib/intern/internLoader.js'
+				loader: './node_modules/grunt-dojo2/lib/intern/loader.js'
 			}
 		},
 		browserstack: {

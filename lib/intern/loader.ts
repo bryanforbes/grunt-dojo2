@@ -1,29 +1,33 @@
+/// <reference types="@dojo/loader"/>
+
 declare const shimAmdDependencies: any;
 
-intern.registerLoader((options) => {
-	return intern.loadScript('node_modules/@dojo/loader/loader.js')
-		.then(() => intern.loadScript('node_modules/@dojo/shim/util/amd.js'))
-		.then(() => {
-			const { packages = [], baseUrl = intern.config.basePath } = options;
-			packages.push({ 'name': 'sinon', 'location': 'node_modules/sinon/pkg', 'main': 'sinon' });
+intern.registerLoader(async (options) => {
+	await intern.loadScript('node_modules/@dojo/loader/loader.js');
+	await intern.loadScript('node_modules/@dojo/shim/util/amd.js');
 
-			(<any> require).config(shimAmdDependencies({
-				baseUrl,
-				...options,
-				packages
-			}));
+	const globalObj: any = typeof window !== 'undefined' ? window : global;
+	const require: DojoLoader.RootRequire = globalObj.require;
 
-			// load @dojo/shim/main to import the ts helpers
-			return new Promise<void>((resolve) => {
-				(<any> require)(['@dojo/shim/main'], () => {
-					resolve();
-				});
-			});
-		}).then(() => {
-			return (modules: string[]) => {
-				return new Promise<void>((resolve, reject) => {
-					(<any> require)(modules, () => resolve());
-				});
-			};
+	const { packages = [], baseUrl = intern.config.basePath } = options;
+	require.config(shimAmdDependencies({
+		baseUrl,
+		...options,
+		packages: [
+			...packages, ...[
+				{ name: 'sinon', location: 'node_modules/sinon/pkg', main: 'sinon' }
+			]
+		]
+	}));
+
+	// load @dojo/shim/main to import the ts helpers
+	await new Promise<void>((resolve) => {
+		require(['@dojo/shim/main'], () => resolve());
+	});
+
+	return (modules: string[]) => {
+		return new Promise<void>((resolve) => {
+			require(modules, () => resolve());
 		});
+	};
 });

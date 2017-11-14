@@ -20,7 +20,7 @@ const instrumenter = istanbul.createInstrumenter({
 	esModules: true
 });
 
-const sourceFile = path.resolve(__dirname, '../../../lib/intern/internLoader.js');
+const sourceFile = path.resolve(__dirname, '../../../../lib/intern/loader.js');
 const loaderCode = fs.readFileSync(sourceFile).toString();
 const instrumentedCode = instrumenter.instrumentSync(loaderCode, sourceFile);
 
@@ -54,7 +54,7 @@ function runTest(before: Function, after: Function) {
 	});
 }
 
-registerSuite('lib/intern/internLoader', {
+registerSuite('lib/intern/loader', {
 	beforeEach() {
 		sandbox = sinon.sandbox.create();
 		requireMock = sandbox.stub().callsArg(1);
@@ -77,8 +77,10 @@ registerSuite('lib/intern/internLoader', {
 		shimMock = sandbox.stub().returnsArg(0);
 
 		context = vm.createContext({
+			global: {
+				require: requireMock
+			},
 			intern: internMock,
-			require: requireMock,
 			shimAmdDependencies: shimMock
 		});
 	},
